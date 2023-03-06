@@ -4,6 +4,9 @@ const { db } = require('../database/db')
 const { userRouter } = require('../routes/user.routes')
 const AppError = require('../utils/appError')
 const globalErrorHandler = require('../controllers/error.controller')
+const { orderRouter } = require('../routes/orders.routes')
+const { mealRouter } = require('../routes/meals.routes')
+const { RestaurantRouter } = require('../routes/restaurants.routes')
 
 class Server {
   constructor() {
@@ -16,7 +19,6 @@ class Server {
       restaurant: '/api/v1/restaurants',
       meal: '/api/v1/meals',
       order: '/api/v1/orders',
-      review: '/api/v1/reviews',
     }
 
     //Connect to db
@@ -37,10 +39,9 @@ class Server {
 
   routes() {
     this.app.use(this.paths.user, userRouter)
-    this.app.use(this.paths.restaurant, restaurantRouter)
+    this.app.use(this.paths.restaurant, RestaurantRouter)
     this.app.use(this.paths.meal, mealRouter)
     this.app.use(this.paths.order, orderRouter)
-    this.app.use(this.paths.review, reviewRouter)
 
     this.app.all('*', (req, res, next) => {
       return next(
