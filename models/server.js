@@ -1,14 +1,14 @@
-const express = require('express');
-const cors = require('cors');
-const { db } = require('../database/db');
-const { userRouter } = require('../routes/user.routes');
-const AppError = require('../utils/appError');
-const globalErrorHandler = require('../controllers/error.controller');
+const express = require('express')
+const cors = require('cors')
+const { db } = require('../database/db')
+const { userRouter } = require('../routes/user.routes')
+const AppError = require('../utils/appError')
+const globalErrorHandler = require('../controllers/error.controller')
 
 class Server {
   constructor() {
-    this.app = express();
-    this.port = process.env.PORT;
+    this.app = express()
+    this.port = process.env.PORT
 
     //Path Routes
     this.paths = {
@@ -17,53 +17,57 @@ class Server {
       meal: '/api/v1/meals',
       order: '/api/v1/orders',
       review: '/api/v1/reviews',
-    };
+    }
 
     //Connect to db
-    this.database();
+    this.database()
 
     //Middlewares
-    this.middlewares();
+    this.middlewares()
 
     //Routes
-    this.routes();
+    this.routes()
   }
 
   middlewares() {
-    this.app.use(cors());
-    this.app.use(express.json());
-    this.app.use(express.static('public'));
+    this.app.use(cors())
+    this.app.use(express.json())
+    this.app.use(express.static('public'))
   }
 
   routes() {
-    this.app.use(this.paths.user, userRouter);
+    this.app.use(this.paths.user, userRouter)
+    this.app.use(this.paths.restaurant, restaurantRouter)
+    this.app.use(this.paths.meal, mealRouter)
+    this.app.use(this.paths.order, orderRouter)
+    this.app.use(this.paths.review, reviewRouter)
 
     this.app.all('*', (req, res, next) => {
       return next(
         new AppError(`Can't find ${req.originalUrl} on this server!`, 404)
-      );
-    });
+      )
+    })
 
-    this.app.use(globalErrorHandler);
+    this.app.use(globalErrorHandler)
   }
 
   database() {
     db.authenticate()
       .then(() => console.log('Database authenticated'))
-      .catch(err => console.log(err));
+      .catch(err => console.log(err))
 
     //relations
 
     db.sync()
       .then(() => console.log('Database synced'))
-      .catch(err => console.log(err));
+      .catch(err => console.log(err))
   }
 
   listen() {
     this.app.listen(this.port, () => {
-      console.log('Server Running On Port', this.port);
-    });
+      console.log('Server Running On Port', this.port)
+    })
   }
 }
 
-module.exports = Server;
+module.exports = Server
